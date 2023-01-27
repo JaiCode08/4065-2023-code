@@ -19,6 +19,7 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -26,7 +27,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
+    // autonomous chooser on the dashboard
     m_robotContainer = new RobotContainer();
   }
 
@@ -81,7 +82,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    // System.out.println("State:" + RobotContainer.m_pne.flagES.get());
+  }
 
   @Override
   public void testInit() {

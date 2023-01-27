@@ -1,0 +1,72 @@
+{
+  "HALProvider": {
+    "Other Devices": {
+      "Talon FX[1]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[1]/Fwd Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[1]/Integrated Sensor": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[1]/Rev Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[2]/Integrated Sensor": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[3]/Fwd Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[3]/Integrated Sensor": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[3]/Rev Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "navX-Sensor[0]": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Auto/SendableChooser[0]": "String Chooser"
+    },
+    "windows": {
+      "/Shuffleboard/Auto/SendableChooser[0]": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
+    "Retained Values": {
+      "open": false
+    }
+  }
+}
