@@ -52,7 +52,7 @@ public class RobotContainer {
     // m_swingarm.setDefaultCommand(new Swing());
 
     configureButtonBindings();
-    m_chooser.addOption("Test", new TestAuto().cmd());
+    m_chooser.addOption("Test", m_drivetrain.loadPathRam("deploy/pathplanner/generatedJSON/test.wpilib.json", true));
     Shuffleboard.getTab("Auto").add(m_chooser);
   }
 

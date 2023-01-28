@@ -30,7 +30,7 @@ public final class Constants {
       public static final int RightSlave = 4;
       public static final int LeftMaster = 1;
       public static final int LeftSlave = 3;
-      public static final double kGearRatio = 10;
+      public static final double kGearRatio = 5.45;
       public static final double kWheelRadiusInches = 2;
       public static final double kWheelCircumferenceInches = 2 * Math.PI * kWheelRadiusInches;
       public static final double kTrackWidthMeters = Units.inchesToMeters(26);
@@ -38,22 +38,19 @@ public final class Constants {
    }
 
    public static final class AutoConstants {
-      public static final double ksVolts = 0.16789;
-      public static final double kvVoltSecondsPerMeter = 3.6358;
-      public static final double kaVoltSecondsSquaredPerMeter = 0.28993;
-      public static final double kPDriveVel = 0.026791;
-      
-      
-      public static final double kMaxSpeedMetersPerSecond = 2;
-      public static final double kMaxAccelMetersPerSecondSqaured = 2;
+      public static final double ksVolts = 0.1925;
+      public static final double kvVoltSecondsPerMeter = 1.7869;
+      public static final double kaVoltSecondsSquaredPerMeter = 0.10251;
+      public static final double kPDriveVel = 1.5 ; // 0.040403
+            
+      public static final double kMaxSpeedMetersPerSecond = 3;
+      public static final double kMaxAccelMetersPerSecondSqaured = 3;
 
       public static final double kRamseteB = 2;
       public static final double kRamseteZeta = 0.7;
 
-      public static final double kEncoderFullRev = 4096;
+      public static final double kEncoderFullRev = 2048;
       
 
-      // 4096 revloutions per rotation of the encoder
-      public static final double kConversionMeters = 1 / (4096 * DriveConstants.kGearRatio * Units.inchesToMeters(DriveConstants.kWheelCircumferenceInches));
    }
 }

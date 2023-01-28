@@ -35,6 +35,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 
@@ -54,7 +55,7 @@ public class DriveTrain extends SubsystemBase {
   WPI_TalonFX rightM = new WPI_TalonFX(Constants.DriveConstants.RightMaster);
   WPI_TalonFX rightS = new WPI_TalonFX(Constants.DriveConstants.RightSlave);
 
-  TalonFX test = new TalonFX(0, getName());
+  private final TalonFXConfiguration fxConfig = new TalonFXConfiguration(); 
 
   // Create motor control groups so it's easier to manage
   MotorControllerGroup leftSideDrive = new MotorControllerGroup(leftM, leftS);
@@ -68,45 +69,39 @@ public class DriveTrain extends SubsystemBase {
   // public double encoderRawVal;
   // public double encoderSetpoint;
 
-  DifferentialDrive diffDrive = new DifferentialDrive(leftSideDrive, rightSideDrive);
+  DifferentialDrive diffDrive;
   public static Gyro g_gyro = new AHRS(SPI.Port.kMXP);
   private final DifferentialDriveOdometry m_odometry;
 
 
   /** Creates a new DriveTrain. */
   public DriveTrain() {
-    leftM.configFactoryDefault();
-    leftS.configFactoryDefault();
-    rightM.configFactoryDefault();
-    rightS.configFactoryDefault();
-
     g_gyro.reset();
-
-    leftSideDrive.setInverted(false);
-    rightSideDrive.setInverted(true);
 
     leftS.follow(leftM);
     rightS.follow(rightM);
 
-    leftM.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-    rightM.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    rightM.setInverted(true);
+    rightS.setInverted(true);
+    leftM.setInverted(false);
+    leftS.setInverted(false);
+
+
+    // leftM.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    // rightM.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     
-    leftM.setSelectedSensorPosition(0);
-    rightM.setSelectedSensorPosition(0);
+    fxConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor;
+
+    resetEncoders();
 
     setBreakMode();
 
+    diffDrive = new DifferentialDrive(leftSideDrive, rightSideDrive);
 
     m_odometry = new DifferentialDriveOdometry(
       g_gyro.getRotation2d(),
-      encoderTicksToMeters(leftM.getSelectedSensorPosition(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches),
-      encoderTicksToMeters(rightM.getSelectedSensorPosition(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches)
-    );
-    m_odometry.resetPosition(
-      g_gyro.getRotation2d(),
-      encoderTicksToMeters(leftM.getSelectedSensorPosition(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches),
-      encoderTicksToMeters(rightM.getSelectedSensorPosition(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches),
-      new Pose2d()
+      encoderTicksToMeters(leftM.getSelectedSensorPosition()),
+      encoderTicksToMeters(rightM.getSelectedSensorPosition())
     );
   }
 
@@ -117,8 +112,8 @@ public class DriveTrain extends SubsystemBase {
     // This method will be called once per scheduler run
     m_odometry.update(
       g_gyro.getRotation2d(),
-      encoderTicksToMeters(leftM.getSelectedSensorPosition(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches),
-      encoderTicksToMeters(rightM.getSelectedSensorPosition(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches)
+      encoderTicksToMeters(leftM.getSelectedSensorPosition()),
+      encoderTicksToMeters(rightM.getSelectedSensorPosition())
     );
 
     SmartDashboard.putNumber("Left encoder values (Meters)", getLeftEncoderPosition());
@@ -126,21 +121,24 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("Right velocity", getRightEncoderVelocity());
     SmartDashboard.putNumber("Left velocity", getLeftEncoderVelocity());
     SmartDashboard.putNumber("Gyro heading", getHeading());
+    SmartDashboard.putNumber("Right encoder", rightM.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Left encoder", leftM.getSelectedSensorPosition());
   }
 
   public void setRight(ControlMode controlmode, double value){
     rightM.set(controlmode, -value);
-    rightS.follow(rightM);
   }
 
   public void setLeft(ControlMode controlmode, double value){
     leftM.set(controlmode, value);
-    leftS.follow(leftM);
   }
 
   // This method can be used to convert encoder ticks to meters 
-  public double encoderTicksToMeters(double currentEncoderValue, double encoderFullRev, double gearRatio, double wheelCircumferenceInInches) {
-    return ((currentEncoderValue / encoderFullRev) / gearRatio) * Units.inchesToMeters(wheelCircumferenceInInches);
+  public double encoderTicksToMeters(double currentEncoderValue) {
+    double motorRotations = (double) currentEncoderValue / Constants.AutoConstants.kEncoderFullRev;
+    double wheelRotations = motorRotations / Constants.DriveConstants.kGearRatio;
+    double positionMeters = wheelRotations * Units.inchesToMeters(Constants.DriveConstants.kWheelCircumferenceInches);
+    return positionMeters;
   }
 
 
@@ -165,24 +163,26 @@ public class DriveTrain extends SubsystemBase {
 
   public void resetEncoders() {
     leftM.setSelectedSensorPosition(0);
+    leftS.setSelectedSensorPosition(0);
     rightM.setSelectedSensorPosition(0);
+    rightS.setSelectedSensorPosition(0);
   }
 
   public double getRightEncoderPosition() {
-    return -encoderTicksToMeters(rightM.getSelectedSensorPosition(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches);
+    return -encoderTicksToMeters(rightM.getSelectedSensorPosition());  
   }
 
   public double getLeftEncoderPosition() {
-    return encoderTicksToMeters(leftM.getSelectedSensorPosition(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches);
+    return -encoderTicksToMeters(leftM.getSelectedSensorPosition());
   }
 
   public double getRightEncoderVelocity() {
     // Multiply the raw velocity by 10 since it reports per 100 ms, we want the velocity in m/s
-    return -encoderTicksToMeters(rightM.getSelectedSensorVelocity(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches) * 10;
+    return -encoderTicksToMeters(rightM.getSelectedSensorVelocity()) * 10;
   }
 
   public double getLeftEncoderVelocity() {
-    return encoderTicksToMeters(leftM.getSelectedSensorVelocity(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches) * 10;
+    return -encoderTicksToMeters(leftM.getSelectedSensorVelocity()) * 10;
   }
 
   public double getTurnRate() {
@@ -190,7 +190,7 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public static double getHeading() {
-    return g_gyro.getRotation2d().getDegrees();
+    return -g_gyro.getRotation2d().getDegrees();
   }
 
   public Pose2d getPose() {
@@ -201,8 +201,8 @@ public class DriveTrain extends SubsystemBase {
     resetEncoders();
     m_odometry.resetPosition(
       g_gyro.getRotation2d(),
-      encoderTicksToMeters(leftM.getSelectedSensorPosition(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches),
-      encoderTicksToMeters(rightM.getSelectedSensorPosition(), 4096, Constants.DriveConstants.kGearRatio, Constants.DriveConstants.kWheelCircumferenceInches),
+      encoderTicksToMeters(leftM.getSelectedSensorPosition()),
+      encoderTicksToMeters(rightM.getSelectedSensorPosition()),
       new Pose2d()
     );
   }
@@ -212,8 +212,8 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void tankDriveVolts(double leftVolts, double rightVolts) {
-    leftM.setVoltage(leftVolts);
-    rightM.setVoltage(rightVolts);
+    leftM.setVoltage(-leftVolts);
+    rightM.setVoltage(-rightVolts);
     diffDrive.feed();
   }
 
