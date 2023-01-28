@@ -34,7 +34,6 @@ import java.nio.file.Path;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
@@ -81,11 +80,10 @@ public class DriveTrain extends SubsystemBase {
     leftS.follow(leftM);
     rightS.follow(rightM);
 
-    rightM.setInverted(true);
-    rightS.setInverted(true);
-    leftM.setInverted(false);
-    leftS.setInverted(false);
-
+    rightM.setInverted(false);
+    rightS.setInverted(false);
+    leftM.setInverted(true);
+    leftS.setInverted(true);
 
     // leftM.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     // rightM.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
@@ -169,28 +167,28 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public double getRightEncoderPosition() {
-    return -encoderTicksToMeters(rightM.getSelectedSensorPosition());  
+    return encoderTicksToMeters(rightM.getSelectedSensorPosition());  
   }
 
   public double getLeftEncoderPosition() {
-    return -encoderTicksToMeters(leftM.getSelectedSensorPosition());
+    return encoderTicksToMeters(leftM.getSelectedSensorPosition());
   }
 
   public double getRightEncoderVelocity() {
     // Multiply the raw velocity by 10 since it reports per 100 ms, we want the velocity in m/s
-    return -encoderTicksToMeters(rightM.getSelectedSensorVelocity()) * 10;
+    return encoderTicksToMeters(rightM.getSelectedSensorVelocity()) * 10;
   }
 
   public double getLeftEncoderVelocity() {
-    return -encoderTicksToMeters(leftM.getSelectedSensorVelocity()) * 10;
+    return encoderTicksToMeters(leftM.getSelectedSensorVelocity()) * 10;
   }
 
   public double getTurnRate() {
-    return -g_gyro.getAngle();
+    return -g_gyro.getRate();
   }
 
   public static double getHeading() {
-    return -g_gyro.getRotation2d().getDegrees();
+    return g_gyro.getAngle();
   }
 
   public Pose2d getPose() {
@@ -203,7 +201,7 @@ public class DriveTrain extends SubsystemBase {
       g_gyro.getRotation2d(),
       encoderTicksToMeters(leftM.getSelectedSensorPosition()),
       encoderTicksToMeters(rightM.getSelectedSensorPosition()),
-      new Pose2d()
+      pose
     );
   }
 
@@ -212,8 +210,8 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void tankDriveVolts(double leftVolts, double rightVolts) {
-    leftM.setVoltage(-leftVolts);
-    rightM.setVoltage(-rightVolts);
+    leftSideDrive.setVoltage(leftVolts);
+    rightSideDrive.setVoltage(rightVolts);
     diffDrive.feed();
   }
 
@@ -234,7 +232,6 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void zeroHeading() {
-    g_gyro.calibrate();
     g_gyro.reset();
   }
 

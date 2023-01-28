@@ -38,10 +38,10 @@ public final class Constants {
    }
 
    public static final class AutoConstants {
-      public static final double ksVolts = 0.1925;
+      public static final double ksVolts = 0.6057;
       public static final double kvVoltSecondsPerMeter = 1.7869;
-      public static final double kaVoltSecondsSquaredPerMeter = 0.10251;
-      public static final double kPDriveVel = 1.5 ; // 0.040403
+      public static final double kaVoltSecondsSquaredPerMeter = 0.37369;
+      public static final double kPDriveVel = 1.4948; // 0.040403
             
       public static final double kMaxSpeedMetersPerSecond = 3;
       public static final double kMaxAccelMetersPerSecondSqaured = 3;
