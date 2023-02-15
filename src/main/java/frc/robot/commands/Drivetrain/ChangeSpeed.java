@@ -2,17 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.Drivetrain;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.DriveTrain;
 
-public class Time extends CommandBase {
-  /** Creates a new Time. */
-  int time_amount;
-  boolean end = false;
-  public Time(int time_amount) {
+public class ChangeSpeed extends CommandBase {
+  /** Creates a new ChangeSpeed. */
+  private double setPercentOutput;
+  private boolean end;
+  public ChangeSpeed(double setPercentOutput) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.time_amount = time_amount;
+    this.setPercentOutput = setPercentOutput;
+    end = false;
   }
 
   // Called when the command is initially scheduled.
@@ -22,18 +25,8 @@ public class Time extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    try {
-      Thread.sleep(time_amount);
-    } catch (InterruptedException e) {
-      
-    }
+    DriveTrain.percentOutput = setPercentOutput;
     end = true;
-   /* try {
-      Thread.sleep(100);
-    } catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } */
   }
 
   // Called once the command ends or is interrupted.

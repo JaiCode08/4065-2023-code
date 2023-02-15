@@ -4,19 +4,15 @@
 
 package frc.robot.commands;
 
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.RobotContainer;
+import frc.robot.subsystems.LEDs;
 
-public class TankDrive extends CommandBase {
-  /** Creates a new TankDrive. */
-  Subsystem s_subsystem;
-  double PO;
-  public TankDrive(Double PO) {
+public class ChangeLED extends CommandBase {
+  /** Creates a new ChangeLED. */
+  boolean end;
+  public ChangeLED() {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.PO = PO;
-    addRequirements(RobotContainer.m_drivetrain);
+    end = false;
   }
 
   // Called when the command is initially scheduled.
@@ -26,13 +22,13 @@ public class TankDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Double RJY = RobotContainer.getDeadZone(1) * PO;
-    Double LJY = RobotContainer.getDeadZone(5) * PO;
-
-    RobotContainer.m_drivetrain.tankDrive(LJY, RJY);
-  
+    if (LEDs.gameObject == true) {
+      LEDs.gameObject = false;
+    } else if (LEDs.gameObject == false) {
+      LEDs.gameObject = true;
+    }
+    end = true;
   }
-
 
   // Called once the command ends or is interrupted.
   @Override
@@ -41,6 +37,6 @@ public class TankDrive extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return end;
   }
 }
