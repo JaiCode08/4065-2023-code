@@ -4,36 +4,36 @@
 
 package frc.robot.commands.Drivetrain;
 
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.DriveTrain;
 
-public class TankDrive extends CommandBase {
-  /** Creates a new TankDrive. */
-  Subsystem s_subsystem;
-  public TankDrive() {
-    //Use addRequirements() here to declare subsystem dependencies.
+public class GetOnRamp extends CommandBase {
+  /** Creates a new getOnRamp. */
+  boolean end;
+  public GetOnRamp() {
+    // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_drivetrain);
-    RobotContainer.m_drivetrain.changeRamp(1.5);
+    end = false;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Double RJY = RobotContainer.getDeadZone(1) * DriveTrain.percentOutput;
-    Double LJY = RobotContainer.getDeadZone(5) * DriveTrain.percentOutput;
+    System.out.println("getting on ramp...");
+    double pitch = Math.abs(RobotContainer.m_drivetrain.getPitch());
+    if (pitch != Constants.AutoConstants.onRampGyro) {
+      RobotContainer.m_drivetrain.tankDrive(0.5, 0.5);
+    }
 
-    if (DriveTrain.isReversed == false) {
-      RobotContainer.m_drivetrain.tankDrive(RJY, LJY);
-    } else if (DriveTrain.isReversed == true) {
-      RobotContainer.m_drivetrain.tankDrive(-LJY, -RJY);
+    if (pitch < Constants.AutoConstants.onRampGyro + 0.25 && pitch > Constants.AutoConstants.onRampGyro - 0.25) {
+      RobotContainer.m_drivetrain.tankDrive(0, 0);
+      RobotContainer.m_drivetrain.setBreakMode();
+      end = true;
     }
   }
 
@@ -44,6 +44,6 @@ public class TankDrive extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return end;
   }
 }

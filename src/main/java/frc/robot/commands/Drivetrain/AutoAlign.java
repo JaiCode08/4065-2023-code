@@ -4,36 +4,31 @@
 
 package frc.robot.commands.Drivetrain;
 
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.DriveTrain;
 
-public class TankDrive extends CommandBase {
-  /** Creates a new TankDrive. */
-  Subsystem s_subsystem;
-  public TankDrive() {
-    //Use addRequirements() here to declare subsystem dependencies.
+public class AutoAlign extends CommandBase {
+  double tarX = RobotContainer.m_rasppicam.getYaw(0);
+  boolean end;
+  /** Creates a new AutoAlign. */
+  public AutoAlign() {
+    // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_drivetrain);
-    RobotContainer.m_drivetrain.changeRamp(1.5);
+    end = false;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Double RJY = RobotContainer.getDeadZone(1) * DriveTrain.percentOutput;
-    Double LJY = RobotContainer.getDeadZone(5) * DriveTrain.percentOutput;
+    tarX = RobotContainer.m_rasppicam.getYaw(0);
+    RobotContainer.m_drivetrain.tankDrive(tarX * 0.05, -tarX * 0.05);
 
-    if (DriveTrain.isReversed == false) {
-      RobotContainer.m_drivetrain.tankDrive(RJY, LJY);
-    } else if (DriveTrain.isReversed == true) {
-      RobotContainer.m_drivetrain.tankDrive(-LJY, -RJY);
+    if (tarX < 0.03 && tarX > -0.03) {
+      end = true;
     }
   }
 
@@ -44,6 +39,6 @@ public class TankDrive extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return end;
   }
 }

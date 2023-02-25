@@ -4,15 +4,19 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 public class LEDs extends SubsystemBase {
   /** Creates a new LEDs. */
-  public static boolean gameObject; // true --> cube, false --> cone
+  public static boolean gameObject = true; // true --> cube, false --> cone
   private static Spark m_blinkin = null;
+  
+  private GenericEntry gameObjectValSB = Robot.mainTab.add("Game Object", gameObject).getEntry();
+
   public LEDs() {
     m_blinkin = new Spark(Constants.Other.blinkInPWM);
     gameObject = true;
@@ -20,10 +24,10 @@ public class LEDs extends SubsystemBase {
 
   @Override
   public void periodic() {
+    gameObjectValSB.setBoolean(gameObject);
     // This method will be called once per scheduler run
-    SmartDashboard.putBoolean("Game Object", gameObject);
     if (gameObject == true) {
-      m_blinkin.set(0.91); // purplse
+      m_blinkin.set(0.91); // purple
     } else {
       m_blinkin.set(0.69); // yellow
     }

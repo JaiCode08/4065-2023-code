@@ -7,12 +7,13 @@ package frc.robot.commands.IntakeCmds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 
-public class SolControl extends CommandBase {
-  /** Creates a new SolControl. */
-  boolean end;
-  public SolControl() {
+public class CustomSolControl extends CommandBase {
+  /** Creates a new CustomSolControl. */
+  boolean state, end;
+  public CustomSolControl(boolean state) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_airsys);
+    this.state = state;
     end = false;
   }
 
@@ -23,7 +24,7 @@ public class SolControl extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.m_airsys.toggleSol();
+    RobotContainer.m_airsys.setSols(state);
     end = true;
   }
 
@@ -34,6 +35,6 @@ public class SolControl extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return end;
   }
 }

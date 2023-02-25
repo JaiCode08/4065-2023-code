@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.util.HashMap;
 
+
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.I2C;
@@ -25,7 +26,7 @@ public final class Constants {
       public static final int RightSlave = 10;
       public static final int LeftMaster = 18;
       public static final int LeftSlave = 19;
-      public static final double kGearRatio = 10.9;
+      public static final double kGearRatio = 10.4;
       public static final double kWheelRadiusInches = 3;
       public static final double kWheelCircumferenceInches = 2 * Math.PI * kWheelRadiusInches;
       public static final double kTrackWidthMeters = Units.inchesToMeters(26);
@@ -35,15 +36,15 @@ public final class Constants {
    public static final class ShooterConstants {
       public static final int ShooterMotorRCAN = 17;
       public static final int ShooterMotorLCAN = 12;
-      public static final double Speed1 = 0.2;
-      public static final double Speed2 = 0.6;
-      public static final double Speed3 = 1;
-      public static final double SpeedNeg = -0.2;  
+      public static final double Speed1 = 3.5;
+      public static final double Speed2 = 7;
+      public static final double Speed3 = 10.54;
+      public static final double SpeedNeg = -3.5;  
    }
 
    public static final class BeltConstants {
       public static final int BeltMotorCAN = 13;
-      public static final double BeltSpeed = 0.75;
+      public static final double BeltSpeed = 0.8;
       public static final double NegBeltSped = -0.5;
    }
 
@@ -53,10 +54,10 @@ public final class Constants {
    }
 
    public static final class AutoConstants {
-      public static final double ksVolts = 0.14534;
-      public static final double kvVoltSecondsPerMeter = 4.0318;
-      public static final double kaVoltSecondsSquaredPerMeter = 0.42035;
-      public static final double kPDriveVel = 0.043262; // PID Mode - kp val ---> 0.13009 STILL NEED TO FIX THE PID value
+      public static final double ksVolts = 0.16695;
+      public static final double kvVoltSecondsPerMeter = 2.4363;
+      public static final double kaVoltSecondsSquaredPerMeter = 0.35229;
+      public static final double kPDriveVel = 0.063471;
             
       public static final double kMaxSpeedMetersPerSecond = 3;
       public static final double kMaxAccelMetersPerSecondSqaured = 3;
@@ -66,13 +67,22 @@ public final class Constants {
 
       public static final double kEncoderFullRev = 2048;
       
-      public static final HashMap<String, Command> testEventMap = new HashMap<>();
-      public static final HashMap<String, Command> anotherTestEventMap = new HashMap<>();
+      public static final HashMap<String, Command> red3GPEventMap = new HashMap<>();
+      public static final HashMap<String, Command> mid = new HashMap<>();
+      public static final HashMap<String, Command> red3GPABEventMap = new HashMap<>();
+      public static final HashMap<String, Command> red1GPEventMap = new HashMap<>();
+      public static final HashMap<String, Command> red1GPABEventMap = new HashMap<>();
+
+      // Auto balance
+      public static final double onRampGyro = 20;
+      public static final double balancedGyro = 0;
+      public static final double backwardsBalancingPower = 1.35;
+      public static final double acceptableAngleRange = 2.5;
    }
 
    public static final class Other {
       public static final int blinkInPWM = 0;
       public static final I2C.Port colorSensorPort = I2C.Port.kOnboard;
-      public static final double detectThreshold = 0.22;
+      public static final double detectThreshold = 2;
    }
 }

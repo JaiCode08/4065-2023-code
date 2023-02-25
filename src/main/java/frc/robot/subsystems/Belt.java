@@ -9,11 +9,13 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.ColorSensorV3;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
 public class Belt extends SubsystemBase {
@@ -21,7 +23,19 @@ public class Belt extends SubsystemBase {
   int mode;
   boolean on, isIntake;
 
+  public TalonFX BeltMotor = new TalonFX(Constants.BeltConstants.BeltMotorCAN);
+  
+  private static final ColorSensorV3 m_colorSensor = new ColorSensorV3(Constants.Other.colorSensorPort);
+  public static Color detectedColor = m_colorSensor.getColor();
+
+  private GenericEntry redValSB = Robot.mainTab.add("RED", detectedColor.red).getEntry();
+  private GenericEntry blueValSB = Robot.mainTab.add("GREEN", detectedColor.green).getEntry();
+  private GenericEntry greenValSB = Robot.mainTab.add("BLUE", detectedColor.blue).getEntry();
+  private GenericEntry beltSpeedValSB = Robot.mainTab.add("BELT SPEED", (BeltMotor.getMotorOutputPercent() * 100) + "%").getEntry();
+
+
   public Belt(int DefaultSpeedMode) {
+    detectedColor = m_colorSensor.getColor();
     on = false;
     mode = DefaultSpeedMode;
     BeltMotor.setInverted(true);
@@ -38,20 +52,17 @@ public class Belt extends SubsystemBase {
     mode = Mode;
   }
 
-  public TalonFX BeltMotor = new TalonFX(Constants.BeltConstants.BeltMotorCAN);
-  
-  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(Constants.Other.colorSensorPort);
-  public static Color detectedColor;
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     detectedColor = m_colorSensor.getColor();
-    SmartDashboard.putNumber("RED", detectedColor.red);
-    SmartDashboard.putNumber("GREEN", detectedColor.green);
-    SmartDashboard.putNumber("BLUE", detectedColor.blue);
+    redValSB.setDouble(detectedColor.red);
+    greenValSB.setDouble(detectedColor.red);
+    blueValSB.setDouble(detectedColor.red);
+    beltSpeedValSB.setString((BeltMotor.getMotorOutputPercent() * 100) + "%");
 
     RobotContainer.downButton = new POVButton(RobotContainer.XboxC, 180);
+    RobotContainer.B1 = new JoystickButton(RobotContainer.XboxC, 11);
 
     if (RobotContainer.downButton.getAsBoolean() == false) {
       // if belt is being used with intake, do regular action
@@ -59,10 +70,6 @@ public class Belt extends SubsystemBase {
         if (on) {
           if (mode == 0) {
             BeltMotor.set(ControlMode.PercentOutput, Constants.BeltConstants.BeltSpeed); 
-    
-          } else if(mode == 1) {
-            BeltMotor.set(ControlMode.PercentOutput, Constants.BeltConstants.NegBeltSped);
-    
           }
         } else {
           BeltMotor.set(ControlMode.PercentOutput, 0);
@@ -75,21 +82,14 @@ public class Belt extends SubsystemBase {
           if (on) {
             if (mode == 0) {
               BeltMotor.set(ControlMode.PercentOutput, 0.5); 
-      
-            } else if(mode == 1) {
-              BeltMotor.set(ControlMode.PercentOutput, Constants.BeltConstants.NegBeltSped);
-      
-            }
+            } 
           } else {
             BeltMotor.set(ControlMode.PercentOutput, 0);
           }
         }
       }
-    } else if (RobotContainer.downButton.getAsBoolean() == true) {
-      BeltMotor.set(ControlMode.PercentOutput, -0.5);
+    } else if (RobotContainer.downButton.getAsBoolean() == true || RobotContainer.B1.getAsBoolean() == true) {
+      BeltMotor.set(ControlMode.PercentOutput, Constants.BeltConstants.NegBeltSped);
     }
-    
-    SmartDashboard.putBoolean("Belt On", on);
-    SmartDashboard.putNumber("Belt Speed", BeltMotor.getMotorOutputPercent());
   }
 }

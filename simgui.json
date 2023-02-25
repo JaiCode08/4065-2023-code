@@ -91,6 +91,7 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Auto/Field": "Field2d",
       "/Shuffleboard/Auto/SendableChooser[0]": "String Chooser",
       "/Shuffleboard/Field/Field": "Field2d"
     },
